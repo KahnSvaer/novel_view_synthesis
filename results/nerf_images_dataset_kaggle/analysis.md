@@ -54,7 +54,7 @@ uv run python -m src.nerf.visualizer \
 - **Output GIF:** `render.gif` (`81` frames, `768×512`)
 
 ## Observations & Notes
-- While the central structure was reconstructed well, noticeable flickering remains around the image borders, likely due to the limited number of training epochs and the sparsity of the input views (only 11 images). Introducing a spatial acceleration structure for faster, more targeted ray querying, along with denser multi-view coverage, could improve novel-view quality.
+- While the central structure was reconstructed well, noticeable flickering remains around the image borders, likely due to the limited number of training epochs and sparse input views (only 11 images). Introducing an adaptive ray-sampling strategy that prioritises regions with higher reconstruction losses could potentially improve these areas by allocating more training samples to poorly reconstructed regions. This would follow a coarse-to-fine refinement principle, progressively focusing training on regions where the reconstruction remains less accurate.
 - Fine details, such as the letterbox on the left wall, exhibited similar flickering and lack of sharpness.
 - Although the central structure is recognizable and coherent, it is not yet crystal clear; increasing the number of epochs and samples per ray would likely improve fidelity, though this was constrained by compute time on a consumer GPU.
 - Some "floater" artifacts (translucent patches appearing in front of the structure in the rendered GIF) are present, likely stemming from insufficient training epochs and residual camera distortion or undistortion inaccuracies.
