@@ -225,20 +225,16 @@ def run_colmap(
     for image_id, image in best_reconstruction.images.items():
         if not image.has_pose:
             continue
+        w2c = np.eye(4, dtype=np.float64)
+        w2c[:3, :4] = image.cam_from_world().matrix()
+        c2w = np.linalg.inv(w2c)
 
-    # COLMAP world-to-camera transformation (3x4).
-    w2c = np.eye(4, dtype=np.float64)
-    w2c[:3, :4] = image.cam_from_world().matrix()
-
-    # Invert to obtain camera-to-world.
-    c2w = np.linalg.inv(w2c)
-
-    images[str(image_id)] = {
-        "name": image.name,
-        "camera_id": image.camera_id,
-        "world_to_camera": w2c.tolist(),
-        "camera_to_world": c2w.tolist(),
-    }
+        images[str(image_id)] = {
+            "name": image.name,
+            "camera_id": image.camera_id,
+            "world_to_camera": w2c.tolist(),
+            "camera_to_world": c2w.tolist(),
+        }
 
 
     # Save camera metadata
