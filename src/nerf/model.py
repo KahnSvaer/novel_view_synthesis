@@ -32,8 +32,9 @@ class _BaseNeRFModel(torch.nn.Module):
         )
         self.sigma_head = torch.nn.Sequential(
             torch.nn.Linear(256, 1),
-            torch.nn.ReLU(inplace=True)
+            torch.nn.Softplus(),
         )
+        torch.nn.init.constant_(self.sigma_head[0].bias, -2.0)
         self.feature_head = torch.nn.Linear(256, 256)
 
         self.linear_layer_3 = torch.nn.Sequential(
@@ -76,8 +77,8 @@ class _BaseNeRFModel(torch.nn.Module):
         Forward pass of the NeRF model.
 
         Args:
-            points: 3D points/features.
-            directions: View direction from the camera
+            points: 3D points/features (..., 3).
+            directions: View direction from the camera (1, 3). 
 
         Returns:
             Features produced by the first NeRF trunk block.
@@ -85,6 +86,7 @@ class _BaseNeRFModel(torch.nn.Module):
         # Add sin cos positional encoding to the input points.
         points_pos = self.positional_encoding(points, self.Lx)
         directions_pos = self.positional_encoding(directions, self.Ld)
+        directions_pos = directions_pos.expand(points_pos.shape[0], -1)
 
         # Forward pass to get the density (sigma).
         features = self.linear_layer_1(points_pos)
